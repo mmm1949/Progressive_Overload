@@ -1,0 +1,66 @@
+{
+  "users": [
+    {
+      "id": "0161e85237242aeb67196f944b3fd5183541ced9",
+      "name": "Mohan Meesala",
+      "email": "mohanmeesala2005@gmail.com",
+      "passwordHash": "980df79a2c69c181c72f601eb16e151cf31b902ec83aeb20eea12add7f6375c4",
+      "passwordSalt": "b7ef7bd6caadd564223a8a1cd9801f3b",
+      "createdAt": "2026-07-28T08:37:58.767428Z"
+    }
+  ],
+  "sessions": [
+    {
+      "token": "973208386279bff7aca55ba86b8c955537ee53edd8452c368dc605f271f55f9e",
+      "userId": "0161e85237242aeb67196f944b3fd5183541ced9",
+      "expiresAt": "2026-08-04T08:37:58.776113Z"
+    },
+    {
+      "token": "4978afc68667ce82f056ab581df9a920925754dd7b3ad56a13ced622c926c83e",
+      "userId": "0161e85237242aeb67196f944b3fd5183541ced9",
+      "expiresAt": "2026-08-04T08:38:21.1892168Z"
+    }
+  ],
+  "workouts": [
+    {
+      "id": "698c216ec12030e066d5c9c1e1430508a30562b0",
+      "userId": "0161e85237242aeb67196f944b3fd5183541ced9",
+      "bodyPart": "Back",
+      "exercise": "Barbell Row",
+      "weight": 25,
+      "reps": 12,
+      "performed": "2026-07-28T00:00:00Z",
+      "createdAt": "2026-07-28T08:38:32.6608958Z"
+    },
+    {
+      "id": "49a93c6d8f2cc8d04ed2f11383221928df97114d",
+      "userId": "0161e85237242aeb67196f944b3fd5183541ced9",
+      "bodyPart": "Chest",
+      "exercise": "Barbell Bench Press",
+      "weight": 40,
+      "reps": 12,
+      "performed": "2026-07-28T00:00:00Z",
+      "createdAt": "2026-07-28T08:52:58.4296871Z"
+    },
+    {
+      "id": "243b45ea1c0d41d29c57edb62f427072f3fd8f9d",
+      "userId": "0161e85237242aeb67196f944b3fd5183541ced9",
+      "bodyPart": "Chest",
+      "exercise": "Barbell Bench Press",
+      "weight": 40,
+      "reps": 12,
+      "performed": "2026-07-28T00:00:00Z",
+      "createdAt": "2026-07-28T08:53:02.4095421Z"
+    },
+    {
+      "id": "b13cb8bc03a73605198beeb804b3af930a10fa40",
+      "userId": "0161e85237242aeb67196f944b3fd5183541ced9",
+      "bodyPart": "Chest",
+      "exercise": "Barbell Bench Press",
+      "weight": 40,
+      "reps": 11,
+      "performed": "2026-07-28T00:00:00Z",
+      "createdAt": "2026-07-28T08:53:06.2760362Z"
+    }
+  ]
+}

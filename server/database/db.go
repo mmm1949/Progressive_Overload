@@ -1,0 +1,99 @@
+package database
+
+import (
+	"context"
+	"errors"
+	"gym-weight-calculator/server/models"
+
+	"github.com/jackc/pgx/v5/pgxpool"
+)
+
+type Database struct{ pool *pgxpool.Pool }
+
+func Connect(ctx context.Context, databaseURL string) (*Database, error) {
+	if databaseURL == "" {
+		return nil, errors.New("DATABASE_URL is required")
+	}
+	pool, err := pgxpool.New(ctx, databaseURL)
+	if err != nil {
+		return nil, err
+	}
+	if err := pool.Ping(ctx); err != nil {
+		pool.Close()
+		return nil, err
+	}
+	db := &Database{pool: pool}
+	if err := db.migrate(ctx); err != nil {
+		pool.Close()
+		return nil, err
+	}
+	return db, nil
+}
+func (db *Database) Close() { db.pool.Close() }
+func (db *Database) migrate(ctx context.Context) error {
+	_, err := db.pool.Exec(ctx, `CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, name TEXT NOT NULL, email TEXT UNIQUE NOT NULL, password_hash TEXT NOT NULL, password_salt TEXT NOT NULL, created_at TIMESTAMPTZ NOT NULL); CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, expires_at TIMESTAMPTZ NOT NULL); CREATE TABLE IF NOT EXISTS workouts (id TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE, body_part TEXT NOT NULL, exercise TEXT NOT NULL, weight DOUBLE PRECISION NOT NULL, reps INTEGER NOT NULL, performed TIMESTAMPTZ NOT NULL, created_at TIMESTAMPTZ NOT NULL, updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()); ALTER TABLE workouts ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(); CREATE INDEX IF NOT EXISTS workouts_user_id_idx ON workouts(user_id); CREATE INDEX IF NOT EXISTS sessions_user_id_idx ON sessions(user_id);`)
+	return err
+}
+func (db *Database) CreateUser(user models.User) error {
+	_, err := db.pool.Exec(context.Background(), `INSERT INTO users (id,name,email,password_hash,password_salt,created_at) VALUES ($1,$2,$3,$4,$5,$6)`, user.ID, user.Name, user.Email, user.PasswordHash, user.PasswordSalt, user.CreatedAt)
+	return err
+}
+func (db *Database) FindUserByEmail(email string) (models.User, bool) {
+	user, err := scanUser(db.pool.QueryRow(context.Background(), `SELECT id,name,email,password_hash,password_salt,created_at FROM users WHERE email=$1`, email))
+	return user, err == nil
+}
+func (db *Database) FindUserByID(id string) (models.User, bool) {
+	user, err := scanUser(db.pool.QueryRow(context.Background(), `SELECT id,name,email,password_hash,password_salt,created_at FROM users WHERE id=$1`, id))
+	return user, err == nil
+}
+func (db *Database) CreateSession(session models.Session) error {
+	_, err := db.pool.Exec(context.Background(), `INSERT INTO sessions (token,user_id,expires_at) VALUES ($1,$2,$3)`, session.Token, session.UserID, session.ExpiresAt)
+	return err
+}
+func (db *Database) FindSession(token string) (models.Session, bool) {
+	var session models.Session
+	err := db.pool.QueryRow(context.Background(), `SELECT token,user_id,expires_at FROM sessions WHERE token=$1 AND expires_at>NOW()`, token).Scan(&session.Token, &session.UserID, &session.ExpiresAt)
+	return session, err == nil
+}
+func (db *Database) DeleteSession(token string) error {
+	_, err := db.pool.Exec(context.Background(), `DELETE FROM sessions WHERE token=$1`, token)
+	return err
+}
+func (db *Database) AddWorkout(workout models.Workout) error {
+	_, err := db.pool.Exec(context.Background(), `INSERT INTO workouts (id,user_id,body_part,exercise,weight,reps,performed,created_at,updated_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)`, workout.ID, workout.UserID, workout.BodyPart, workout.Exercise, workout.Weight, workout.Reps, workout.Performed, workout.CreatedAt, workout.UpdatedAt)
+	return err
+}
+func (db *Database) ListWorkouts(userID string) []models.Workout {
+	rows, err := db.pool.Query(context.Background(), `SELECT id,user_id,body_part,exercise,weight,reps,performed,created_at,updated_at FROM workouts WHERE user_id=$1 ORDER BY created_at ASC`, userID)
+	if err != nil {
+		return []models.Workout{}
+	}
+	defer rows.Close()
+	workouts := make([]models.Workout, 0)
+	for rows.Next() {
+		var workout models.Workout
+		if err := rows.Scan(&workout.ID, &workout.UserID, &workout.BodyPart, &workout.Exercise, &workout.Weight, &workout.Reps, &workout.Performed, &workout.CreatedAt, &workout.UpdatedAt); err == nil {
+			workouts = append(workouts, workout)
+		}
+	}
+	return workouts
+}
+
+func (db *Database) UpdateWorkout(userID, workoutID string, weight float64, reps int) (models.Workout, bool) {
+	var workout models.Workout
+	err := db.pool.QueryRow(context.Background(), `UPDATE workouts SET weight=$1, reps=$2, updated_at=NOW() WHERE id=$3 AND user_id=$4 RETURNING id,user_id,body_part,exercise,weight,reps,performed,created_at,updated_at`, weight, reps, workoutID, userID).Scan(&workout.ID, &workout.UserID, &workout.BodyPart, &workout.Exercise, &workout.Weight, &workout.Reps, &workout.Performed, &workout.CreatedAt, &workout.UpdatedAt)
+	return workout, err == nil
+}
+
+func (db *Database) DeleteWorkout(userID, workoutID string) bool {
+	result, err := db.pool.Exec(context.Background(), `DELETE FROM workouts WHERE id=$1 AND user_id=$2`, workoutID, userID)
+	return err == nil && result.RowsAffected() == 1
+}
+
+type rowScanner interface{ Scan(...any) error }
+
+func scanUser(row rowScanner) (models.User, error) {
+	var user models.User
+	err := row.Scan(&user.ID, &user.Name, &user.Email, &user.PasswordHash, &user.PasswordSalt, &user.CreatedAt)
+	return user, err
+}
