@@ -1,9 +1,11 @@
 export const exercisesByBodyPart = {
-  Chest: ['Barbell Bench Press', 'Incline Dumbbell Press', 'Cable Fly'],
-  Back: ['Barbell Row', 'Lat Pulldown', 'Seated Cable Row'],
-  Legs: ['Barbell Squat', 'Romanian Deadlift', 'Leg Press'],
-  Shoulders: ['Overhead Press', 'Lateral Raise', 'Rear Delt Fly'],
-  Arms: ['Barbell Curl', 'Triceps Pushdown', 'Hammer Curl'],
+  Chest: ['Flat Bench Smith Machine', 'Incline Dumbbell Press', 'Butter Fly', 'Cable Fly'],
+  Back: ['Lat Pulldown', 'Seated Cable Row', 'Face Pull', 'Rear Delt Fly'],
+  Legs: ['Barbell Squat', 'Leg Extention', 'Leg Press', 'Leg curl'],
+  Shoulders: ['Overhead Press', 'Lateral Raise', 'Shrughs', 'Front Raise'],
+  Triceps: ['Triceps Pushdown', 'Overhead tricep extention', 'Overhead dumble raise'],
+  Biceps : ['Hammer Curl', 'EZ bar curl', 'Cable Curl'],
+  Abs : ['Situps', 'Leg raises', 'Plank']
 } as const
 
 export type BodyPart = keyof typeof exercisesByBodyPart
@@ -32,9 +34,9 @@ const starterLogs: WorkoutLog[] = [
   { bodyPart: 'Shoulders', exercise: 'Overhead Press', weight: 45, reps: 6, date: '2026-07-23' },
   { bodyPart: 'Shoulders', exercise: 'Lateral Raise', weight: 12, reps: 12, date: '2026-07-23' },
   { bodyPart: 'Shoulders', exercise: 'Rear Delt Fly', weight: 30, reps: 12, date: '2026-07-23' },
-  { bodyPart: 'Arms', exercise: 'Barbell Curl', weight: 35, reps: 8, date: '2026-07-21' },
-  { bodyPart: 'Arms', exercise: 'Triceps Pushdown', weight: 40, reps: 10, date: '2026-07-21' },
-  { bodyPart: 'Arms', exercise: 'Hammer Curl', weight: 16, reps: 10, date: '2026-07-21' },
+  { bodyPart: 'Biceps', exercise: 'Barbell Curl', weight: 35, reps: 8, date: '2026-07-21' },
+  { bodyPart: 'Triceps', exercise: 'Triceps Pushdown', weight: 40, reps: 10, date: '2026-07-21' },
+  { bodyPart: 'Biceps', exercise: 'Hammer Curl', weight: 16, reps: 10, date: '2026-07-21' },
 ]
 
 export function getWorkoutLogs(): WorkoutLog[] {
