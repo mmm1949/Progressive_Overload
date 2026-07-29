@@ -136,6 +136,22 @@ function Progress() {
     }
   }
 
+  async function deleteSet(workoutId: string) {
+    if (!window.confirm('Delete this set?')) return
+    const token = getToken()
+    if (!token) return
+    try {
+      await apiRequest<void>(`/workouts/${workoutId}`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      setWorkouts((prev) => prev.filter((w) => w.id !== workoutId))
+      if (editingId === workoutId) cancelEdit()
+    } catch (err) {
+      setLoadError(err instanceof Error ? err.message : 'Unable to delete set.')
+    }
+  }
+
   function toggleGroup(key: string) {
     setOpenGroups((prev) => ({ ...prev, [key]: !prev[key] }))
   }
@@ -366,8 +382,15 @@ function Progress() {
                                   >
                                     Edit
                                   </button>
-                                </div>
-                              )}
+                                  {idx >= 3 && (
+                                    <button
+                                      onClick={() => deleteSet(set.id)} className="rounded-lg border border-rose-700/60 px-3 py-1 text-xs font-semibold text-rose-300 transition hover:bg-rose-500/10 hover:text-rose-200">
+                                      Delete
+                                    </button>
+                                  )}
+                                    
+                                  </div>
+                                )}
                             </div>
                           ))}
                         </div>
