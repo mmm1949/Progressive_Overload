@@ -21,5 +21,10 @@ func Register(mux *http.ServeMux, db *database.Database) {
 	mux.HandleFunc("POST /api/workouts", handler.CreateWorkout)
 	mux.HandleFunc("PATCH /api/workouts/{id}", handler.UpdateWorkout)
 	mux.HandleFunc("DELETE /api/workouts/{id}", handler.DeleteWorkout)
+	mux.HandleFunc("GET /api/exercises", handler.ListExercises)
+	mux.HandleFunc("POST /api/exercises", handler.CreateExercise)
+	mux.HandleFunc("GET /api/exercises/{id}", handler.GetExercise)
+	mux.HandleFunc("PATCH /api/exercises/{id}", handler.UpdateExercise)
+	mux.HandleFunc("DELETE /api/exercises/{id}", handler.DeleteExercise)
 	mux.HandleFunc("GET /api/personal-records", handler.PersonalRecords)
 }

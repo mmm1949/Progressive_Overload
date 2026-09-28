@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { apiRequest, type AuthResponse } from '../lib/api.js'
 import { saveSession } from '../lib/auth.js'
 
@@ -7,6 +7,8 @@ function Login() {
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const navigate = useNavigate()
+  const location = useLocation()
+  const redirectTo = (location.state as { from?: string } | null)?.from || '/progress'
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -16,7 +18,7 @@ function Login() {
     try {
       const session = await apiRequest<AuthResponse>('/auth/login', { method: 'POST', body: JSON.stringify({ email: form.get('email'), password: form.get('password') }) })
       saveSession(session)
-      navigate('/progress')
+      navigate(redirectTo, { replace: true })
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'Unable to sign in.')
     } finally { setIsSubmitting(false) }

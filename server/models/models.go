@@ -16,13 +16,23 @@ type Session struct {
 	ExpiresAt time.Time `json:"expiresAt"`
 }
 type Workout struct {
-	ID        string    `json:"id"`
-	UserID    string    `json:"userId"`
-	BodyPart  string    `json:"bodyPart"`
-	Exercise  string    `json:"exercise"`
-	Weight    float64   `json:"weight"`
-	Reps      int       `json:"reps"`
-	Performed time.Time `json:"performed"`
-	CreatedAt time.Time `json:"createdAt"`
-	UpdatedAt time.Time `json:"updatedAt"`
+	ID          string    `json:"id"`
+	UserID      string    `json:"userId"`
+	BodyPart    string    `json:"bodyPart"`
+	MuscleGroup string    `json:"muscleGroup"`
+	Exercise    string    `json:"exercise"`
+	Weight      float64   `json:"weight"`
+	Reps        int       `json:"reps"`
+	Performed   time.Time `json:"performed"`
+	CreatedAt   time.Time `json:"createdAt"`
+	UpdatedAt   time.Time `json:"updatedAt"`
+}
+
+type UserExercise struct {
+	ID          string    `json:"id"`
+	UserID      string    `json:"userId"`
+	BodyPart    string    `json:"bodyPart"`
+	MuscleGroup string    `json:"muscleGroup"`
+	Exercise    string    `json:"exercise"`
+	CreatedAt   time.Time `json:"createdAt"`
 }

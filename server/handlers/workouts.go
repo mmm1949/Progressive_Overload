@@ -9,11 +9,12 @@ import (
 )
 
 type workoutRequest struct {
-	BodyPart  string  `json:"bodyPart"`
-	Exercise  string  `json:"exercise"`
-	Weight    float64 `json:"weight"`
-	Reps      int     `json:"reps"`
-	Performed string  `json:"performed"`
+	BodyPart    string  `json:"bodyPart"`
+	MuscleGroup string  `json:"muscleGroup"`
+	Exercise    string  `json:"exercise"`
+	Weight      float64 `json:"weight"`
+	Reps        int     `json:"reps"`
+	Performed   string  `json:"performed"`
 }
 
 func (h *Handler) ListWorkouts(w http.ResponseWriter, r *http.Request) {
@@ -32,8 +33,8 @@ func (h *Handler) CreateWorkout(w http.ResponseWriter, r *http.Request) {
 	if !decodeJSON(w, r, &input) {
 		return
 	}
-	if strings.TrimSpace(input.BodyPart) == "" || strings.TrimSpace(input.Exercise) == "" || input.Weight < 0 || input.Reps < 1 {
-		writeError(w, http.StatusBadRequest, "body part, exercise, non-negative weight, and reps are required")
+	if strings.TrimSpace(input.BodyPart) == "" || strings.TrimSpace(input.MuscleGroup) == "" || strings.TrimSpace(input.Exercise) == "" || input.Weight < 0 || input.Reps < 1 {
+		writeError(w, http.StatusBadRequest, "body part, muscle group, exercise, non-negative weight, and reps are required")
 		return
 	}
 	performed := time.Now().UTC()
@@ -46,7 +47,7 @@ func (h *Handler) CreateWorkout(w http.ResponseWriter, r *http.Request) {
 		performed = parsed
 	}
 	now := time.Now().UTC()
-	workout := models.Workout{ID: mustToken(20), UserID: user.ID, BodyPart: input.BodyPart, Exercise: input.Exercise, Weight: input.Weight, Reps: input.Reps, Performed: performed, CreatedAt: now, UpdatedAt: now}
+	workout := models.Workout{ID: mustToken(20), UserID: user.ID, BodyPart: strings.TrimSpace(input.BodyPart), MuscleGroup: strings.TrimSpace(input.MuscleGroup), Exercise: strings.TrimSpace(input.Exercise), Weight: input.Weight, Reps: input.Reps, Performed: performed, CreatedAt: now, UpdatedAt: now}
 	if err := h.DB.AddWorkout(workout); err != nil {
 		writeError(w, http.StatusInternalServerError, "could not save workout")
 		return
@@ -71,10 +72,16 @@ func (h *Handler) PersonalRecords(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) UpdateWorkout(w http.ResponseWriter, r *http.Request) {
 	user, ok := h.currentUser(w, r)
 	if !ok { return }
-	var input struct { Weight float64 `json:"weight"`; Reps int `json:"reps"` }
+	var input struct {
+		BodyPart    string  `json:"bodyPart"`
+		MuscleGroup string  `json:"muscleGroup"`
+		Exercise    string  `json:"exercise"`
+		Weight      float64 `json:"weight"`
+		Reps        int     `json:"reps"`
+	}
 	if !decodeJSON(w, r, &input) { return }
 	if input.Weight < 0 || input.Reps < 1 { writeError(w, http.StatusBadRequest, "non-negative weight and reps are required"); return }
-	workout, updated := h.DB.UpdateWorkout(user.ID, r.PathValue("id"), input.Weight, input.Reps)
+	workout, updated := h.DB.UpdateWorkout(user.ID, r.PathValue("id"), input.BodyPart, input.MuscleGroup, input.Exercise, input.Weight, input.Reps)
 	if !updated { writeError(w, http.StatusNotFound, "workout not found"); return }
 	writeJSON(w, http.StatusOK, workout)
 }

@@ -4,7 +4,7 @@ function Home() {
   return (
     <main className="min-h-screen bg-slate-950 px-4 pb-12 pt-28 text-slate-100 sm:px-8">
       <section className="mx-auto max-w-5xl overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-br from-slate-900 via-slate-900 to-emerald-950/50 p-7 sm:p-12">
-        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-400">Welcome to LiftLog</p>
+        <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-400">Welcome to Progressive Overload LiftLog</p>
         <h1 className="mt-4 max-w-3xl text-4xl font-bold tracking-tight sm:text-6xl">Make every workout stronger than the last.</h1>
         <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">Track your working sets, celebrate personal records, and make progressive overload simple.</p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
